@@ -20,9 +20,31 @@ class MyPlugin(Star):
         logger.info(message_chain)
         yield event.plain_result(f"Hello, {user_name}, 你发了 {message_str}!") # 发送一条纯文本消息
 
+    def traverse_and_log_text(self, obj, visited=None):
+        if visited is None:
+            visited = set()
+        
+        if isinstance(obj, str):
+            logger.info(obj)
+            return
+
+        # Prevent infinite recursion / re-visiting same objects
+        if id(obj) in visited:
+            return
+        visited.add(id(obj))
+
+        if isinstance(obj, dict):
+            for v in obj.values():
+                self.traverse_and_log_text(v, visited)
+        elif isinstance(obj, (list, tuple)):
+            for item in obj:
+                self.traverse_and_log_text(item, visited)
+        elif hasattr(obj, "__dict__"):
+            self.traverse_and_log_text(obj.__dict__, visited)
+
     @filter.event_message_type(filter.EventMessageType.ALL)
     async def on_all_message(self, event: AstrMessageEvent):
-        logger.info(event)
+        self.traverse_and_log_text(event)
         yield event.plain_result("收到了一条消息。")
 
     async def terminate(self):
