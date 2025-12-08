@@ -22,7 +22,7 @@ class MyPlugin(Star):
 
     @filter.event_message_type(filter.EventMessageType.ALL)
     async def on_all_message(self, event: AstrMessageEvent):
-        logger.info(event.raw_message)
+        logger.info(event)
         yield event.plain_result("收到了一条消息。")
 
     async def terminate(self):
