@@ -34,7 +34,8 @@ class MyPlugin(Star):
         visited.add(id(obj))
 
         if isinstance(obj, dict):
-            for v in obj.values():
+            for k, v in obj.items():
+                logger.info(f"Key: {k}")
                 self.traverse_and_log_text(v, visited)
         elif isinstance(obj, (list, tuple)):
             for item in obj:
@@ -42,7 +43,7 @@ class MyPlugin(Star):
         elif hasattr(obj, "__dict__"):
             self.traverse_and_log_text(obj.__dict__, visited)
 
-    @filter.event_message_type(filter.EventMessageType.ALL)
+    @filter.event_message_type(filter.EventMessageType.PRIVATE_MESSAGE)
     async def on_all_message(self, event: AstrMessageEvent):
         self.traverse_and_log_text(event)
         yield event.plain_result("收到了一条消息。")
